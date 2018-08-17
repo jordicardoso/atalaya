@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.1.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="
+            http://www.osgi.org/xmlns/blueprint/v1.0.0 https://osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+            http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/spring/camel-blueprint.xsd
+            http://aries.apache.org/xmlns/jpa/v1.1.0 http://aries.apache.org/schemas/jpa/jpa_110.xsd">
+
+    <bean id="listAggregation" class="aggregationStrategy.ListAggregationStrategy"/>
+
+    <camelContext id="atalayaEIP" xmlns="http://camel.apache.org/schema/blueprint" useMDCLogging="true">
+
+        <propertyPlaceholder id="properties"
+                             location="classpath:/etc/uri.properties"
+                             xmlns="http://camel.apache.org/schema/blueprint" />
+
+        <streamCaching id="CacheConfig" bufferSize="100024000"
+                       spoolThreshold="100024000" />
+
+        <dataFormats>
+            <json id="json" library="Jackson" unmarshalTypeName="java.util.Map"/>
+            <bindy id="csv" type="Csv" classType="csv.T100"/>
+            <bindy id="csvwbcrossgt" type="Csv" classType="csv.WBCROSSGT"/>
+            <json id="t100_json" library="Jackson" unmarshalTypeName="json.t100"/>
+            <json id="wbcrossgt_json" library="Jackson" unmarshalTypeName="json.wbcrossgt"/>
+        </dataFormats>
+
+        <restConfiguration apiContextListing="true"
+                           apiContextPath="api-docs" bindingMode="json" component="jetty"
+                           contextPath="camel/1.0" enableCORS="true" host="0.0.0.0" port="8282">
+
+            <dataFormatProperty key="prettyPrint" value="true" />
+            <apiProperty key="base.path" value="rest" />
+            <apiProperty key="api.version" value="0.0.1" />
+            <apiProperty key="api.title" value="t100" />
+            <apiProperty key="api.description" value="T100 API" />
+            <apiProperty key="api.contact.name" value="Atalaya Consulting" />
+            <apiProperty key="cors" value="true" />
+        </restConfiguration>
+
+        <rest path="/" consumes="json/xml" produces="application/json">
+            <description>T100</description>
+            <get uri="/runsql">
+                <description>check T100 tables</description>
+                <responseMessage code="200" message="Ok" />
+                <responseMessage code="404" message="Error, no hi ha taules" />
+                <route id="getTablesT100">
+                    <log message="ok"/>
+                </route>
+            </get>
+            <put uri="/runsql">
+                <description>create T100 tables</description>
+                <responseMessage code="200" message="Ok" />
+                <responseMessage code="404" message="Error, No s'han pogut crear les taules" />
+                <route id="createTablesT100">
+                    <log message="ok"/>
+                </route>
+            </put>
+            <delete uri="/runsql">
+                <description>delete T100 tables</description>
+                <responseMessage code="200" message="Ok" />
+                <responseMessage code="404" message="Error, No s'han pogut eliminar les taules" />
+                <route id="dropTablesT100">
+                    <log message="ok"/>
+                </route>
+            </delete>
+        </rest>
+
+        <rest path="/" consumes="text/csv" produces="application/json">
+
+            <post uri="/transfer">
+                <description>load T100 data</description>
+                <responseMessage code="200" message="Ok" />
+                <responseMessage code="404" message="Error, No s'han pogut insertar les dades" />
+                <route id="loadDataT100">
+                    <log message="ok"/>
+                </route>
+            </post>
+        </rest>
+
+        <route autoStartup="true" id="loadT100csv" streamCache="true">
+            <from uri="file:camel/data?fileName=T100.csv"/>
+            <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading t100..."/>
+            <split streaming="true" parallelProcessing="true">
+                <tokenize token="\n"/>
+                <convertBodyTo type="String"/>
+                <unmarshal ref="csv"/>
+                <marshal ref="t100_json"/>
+                <to uri="{{t100csvMQ}}"/>
+            </split>
+            <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Loaded t100 dataset into Database"/>
+        </route>
+
+        <route autoStartup="true" id="loadwbcrossgtcsv" streamCache="true">
+            <from uri="file:camel/data?fileName=WBCROSSGT.csv"/>
+            <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading wbcrossgt..."/>
+            <split streaming="true" parallelProcessing="true">
+                <tokenize token="\n"/>
+                <convertBodyTo type="String"/>
+                <unmarshal ref="csvwbcrossgt"/>
+                <marshal ref="wbcrossgt_json"/>
+                <to uri="{{wbcrossgtcsvMQ}}"/>
+            </split>
+            <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Loaded wbcrossgt dataset into Database"/>
+        </route>
+
+        <route autoStartup="true" id="aggregateT100" streamCache="true">
+            <from uri="{{t100csvMQ}}"/>
+            <transacted ref="PROPAGATION_REQUIRED"/>
+            <unmarshal ref="json"/>
+            <validate>
+                <simple>${body} is 'java.util.Map'</simple>
+            </validate>
+            <aggregate parallelProcessing="true" completionTimeout="1000" forceCompletionOnStop="true" strategyRef="listAggregation" completionSize="100">
+                <correlationExpression>
+                    <constant>true</constant>
+                </correlationExpression>
+                <to uri="sql:insert into T100 (SPRSL, MSG, MSGNR, TEXT, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#sprsl', ':#msg', ':#msgnr', ':#text', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=atalayaDs"/>
+            </aggregate>
+        </route>
+
+        <route autoStartup="true" id="aggregateWbcrossgt" streamCache="true">
+            <from uri="{{wbcrossgtcsvMQ}}"/>
+            <!--<transacted ref="PROPAGATION_REQUIRED"/>-->
+            <unmarshal ref="json"/>
+            <validate>
+                <simple>${body} is 'java.util.Map'</simple>
+            </validate>
+            <aggregate id="aggregateWbcrossgt"  parallelProcessing="true" completionTimeout="1000" forceCompletionOnStop="true" strategyRef="listAggregation" completionSize="100">
+                <correlationExpression>
+                    <constant>true</constant>
+                </correlationExpression>
+                <to uri="sql:insert into WBCROSSGT (OTYPE, NAME, INCLUDE, DIRECT, INDIRECT, COMPONENT, ISHASH, UDATE, UZEIT, UNAME, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#otype', ':#name', ':#include', ':#direct', ':#indirect', ':#component', ':#ishash',  ':#udate', ':#uzeit', ':#uname', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=atalayaDs"/>
+            </aggregate>
+        </route>
+
+    </camelContext>
+
+    <!-- TX configuration -->
+    <bean id="transactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
+        <property name="connectionFactory" ref="pooledJmsConnectionFactory"/>
+    </bean>
+
+    <bean id="PROPAGATION_REQUIRED" class="org.apache.camel.spring.spi.SpringTransactionPolicy">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"/>
+    </bean>
+
+    <!-- JMS configuration -->
+    <bean id="pooledJmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" init-method="start" destroy-method="stop">
+        <property name="maxConnections" value="8" />
+        <property name="connectionFactory" ref="jmsConnectionFactory" />
+    </bean>
+
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+        <property name="userName" value="smx" />
+        <property name="password" value="smx" />
+        <property name="redeliveryPolicy">
+            <bean class="org.apache.activemq.RedeliveryPolicy">
+                <property name="maximumRedeliveries" value="0"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- JMS configuration with transactions -->
+    <bean id="activemqTx" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="connectionFactory" ref="pooledJmsConnectionFactory"/>
+        <property name="transacted" value="true"/>
+        <property name="transactionManager" ref="transactionManager"/>
+    </bean>
+
+    <!-- JMS configuration for test enqueue/dequeue without transactions -->
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="connectionFactory" ref="pooledJmsConnectionFactory"/>
+        <property name="transacted" value="false"/>
+    </bean>
+
+</blueprint>
