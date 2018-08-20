@@ -10,9 +10,6 @@ import java.io.InputStream;
 import java.net.URI;
 
 public class atalayaEIPTest extends CamelBlueprintTestSupport {
-    public static final String SPROP_CAMEL_CONTEXT_CREATION_TIMEOUT = "org.apache.camel.test.blueprint.camelContextCreationTimeout";
-
-
     private static final String URI_START = "direct:start";
     private static final String URI_END = "mock:result";
 
@@ -52,7 +49,6 @@ public class atalayaEIPTest extends CamelBlueprintTestSupport {
 
         MockEndpoint result = getMockEndpoint("mock:result");
         context.start();
-
         result.expectedMessageCount(0);
 
         result.assertIsSatisfied();

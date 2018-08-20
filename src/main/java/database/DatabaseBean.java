@@ -1,3 +1,5 @@
+package database;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,7 +11,7 @@ import javax.sql.DataSource;
  */
 public class DatabaseBean {
 
-    private static final Logger LOG = LoggerFactory.getLogger(database.DatabaseBean.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseBean.class);
     private DataSource dataSource;
 
     public DataSource getDataSource() {
