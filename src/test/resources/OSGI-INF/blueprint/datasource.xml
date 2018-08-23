@@ -28,17 +28,18 @@
         <property name="password" value="" />
     </bean>
 
-	<bean id="initDatabase" class="database.DatabaseBean"
+	<bean id="initDatabase" class="DatabaseBean"
 		  init-method="create" destroy-method="destroy">
 		<property name="dataSource" ref="atalayaDs"/>
 	</bean>
 
-    <bean id="databaseBean" class="database.DatabaseBean"/>
+    <bean id="databaseBean" class="DatabaseBean"/>
 
-    <service ref="atalayaDs" interface="javax.sql.DataSource" ranking="5">
+    <!--
+    <service ref="atalaya" interface="javax.sql.DataSource" ranking="5">
         <service-properties>
-            <entry key="datasource.name" value="atalaya"/>
+            <entry key="datasource.name" value="atalayaDs"/>
         </service-properties>
     </service>
-
+    -->
 </blueprint>

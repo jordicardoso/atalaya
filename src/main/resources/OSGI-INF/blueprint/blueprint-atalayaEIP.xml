@@ -9,9 +9,6 @@
 
     <bean id="listAggregation" class="aggregationStrategy.ListAggregationStrategy"/>
 
-    <reference id="atalayaDs" interface="javax.sql.DataSource"
-               filter="(osgi.jndi.service.name=atalaya)" availability="mandatory" />
-
     <camelContext id="atalayaEIP" xmlns="http://camel.apache.org/schema/blueprint" useMDCLogging="true">
 
         <propertyPlaceholder id="properties"
@@ -97,7 +94,7 @@
 
 
         <route autoStartup="true" id="loadwbcrossgtcsv" streamCache="true">
-            <from uri="file:camel/data?fileName=wbcrossgt2.csv&amp;noop=true"/>
+            <from uri="file:camel/data?fileName=wbcrossgt.csv&amp;noop=true"/>
             <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading wbcrossgt..."/>
             <split streaming="true" parallelProcessing="true">
                 <tokenize token="\n"/>

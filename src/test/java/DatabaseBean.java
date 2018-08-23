@@ -9,7 +9,7 @@ import javax.sql.DataSource;
  */
 public class DatabaseBean {
 
-    private static final Logger LOG = LoggerFactory.getLogger(database.DatabaseBean.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseBean.class);
     private DataSource dataSource;
 
     public DataSource getDataSource() {
