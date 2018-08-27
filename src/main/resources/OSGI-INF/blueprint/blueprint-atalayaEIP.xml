@@ -15,8 +15,12 @@
                              location="classpath:etc/uri.properties"
                              xmlns="http://camel.apache.org/schema/blueprint" />
 
+
+
         <streamCaching id="CacheConfig" bufferSize="100024000"
                        spoolThreshold="100024000" />
+
+        <threadPoolProfile id="concurrentProfile" poolSize="50" maxPoolSize="80" maxQueueSize="-1"/>
 
         <dataFormats>
             <json id="json" library="Jackson" unmarshalTypeName="java.util.Map"/>
@@ -80,7 +84,7 @@
         </rest>
 
         <route autoStartup="false" id="loadT100csv" streamCache="true">
-            <from uri="file:camel/data?fileName=T100.csv&amp;noop=true"/>
+            <from uri="file:camel/data?fileName=T100.csv&amp;noop=false"/>
             <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading t100..."/>
             <split streaming="true" parallelProcessing="true">
                 <tokenize token="\n"/>
@@ -94,9 +98,9 @@
 
 
         <route autoStartup="true" id="loadwbcrossgtcsv" streamCache="true">
-            <from uri="file:camel/data?fileName=wbcrossgt.csv&amp;noop=true"/>
+            <from uri="file:camel/data?fileName=wbcrossgt.csv&amp;noop=false"/>
             <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading wbcrossgt..."/>
-            <split streaming="true" parallelProcessing="true">
+            <split streaming="true" parallelProcessing="true" executorServiceRef="concurrentProfile">
                 <tokenize token="\n"/>
                 <convertBodyTo type="String"/>
                 <unmarshal ref="csvwbcrossgt"/>
@@ -117,22 +121,29 @@
                 <correlationExpression>
                     <constant>true</constant>
                 </correlationExpression>
-                <to uri="sql:insert into T100 (SPRSL, MSG, MSGNR, TEXT, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#sprsl', ':#msg', ':#msgnr', ':#text', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=atalayaDs"/>
+                <setHeader headerName="aggregate">
+                    <constant></constant>
+                </setHeader>
+                <!--<log message="${body}"/>-->
+                <!--<to uri="sql:insert into T100 (SPRSL, MSG, MSGNR, TEXT, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#sprsl', ':#msg', ':#msgnr', ':#text', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=atalayaDs"/>-->
             </aggregate>
         </route>
 
         <route autoStartup="true" id="aggregateWbcrossgt" streamCache="true">
             <from uri="{{wbcrossgtcsvMQ}}"/>
-            <!--<transacted ref="PROPAGATION_REQUIRED"/>-->
+            <transacted ref="PROPAGATION_REQUIRED"/>
             <unmarshal ref="json"/>
             <validate>
                 <simple>${body} is 'java.util.Map'</simple>
             </validate>
-            <aggregate id="aggregateWbcrossgt"  parallelProcessing="true" completionTimeout="1000" forceCompletionOnStop="true" strategyRef="listAggregation" completionSize="100">
+            <aggregate id="aggregateWbcrossgt"  parallelProcessing="true" completionTimeout="5000" forceCompletionOnStop="true" strategyRef="listAggregation" completionSize="50">
                 <correlationExpression>
                     <constant>true</constant>
                 </correlationExpression>
-                <to uri="sql:insert into WBCROSSGT (OTYPE, NAME, INCLUDE, DIRECT, INDIRECT, COMPONENT, ISHASH, UDATE, UZEIT, UNAME, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values ('1', '2', '3', '4', '5', '6', '7',  '8', '9', '10', '11', '12', '13')?batch=true&amp;dataSourceRef=atalayaDs"/>
+                <setHeader headerName="aggregate">
+                    <constant></constant>
+                </setHeader>
+                <!--<to uri="sql:insert into WBCROSSGT (OTYPE, NAME, INCLUDE, DIRECT, INDIRECT, COMPONENT, ISHASH, UDATE, UZEIT, UNAME, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values ('1', '2', '3', '4', '5', '6', '7',  '8', '9', '10', '11', '12', '13')?batch=true&amp;dataSourceRef=atalayaDs"/>-->
                 <!--<to uri="sql:insert into WBCROSSGT (OTYPE, NAME, INCLUDE, DIRECT, INDIRECT, COMPONENT, ISHASH, UDATE, UZEIT, UNAME, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#otype', ':#name', ':#include', ':#direct', ':#indirect', ':#component', ':#ishash',  ':#udate', ':#uzeit', ':#uname', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=atalayaDs"/>-->
             </aggregate>
         </route>
@@ -157,8 +168,8 @@
 
     <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL" value="tcp://localhost:61616"/>
-        <property name="userName" value="smx" />
-        <property name="password" value="smx" />
+        <property name="userName" value="karaf" />
+        <property name="password" value="karaf" />
         <property name="redeliveryPolicy">
             <bean class="org.apache.activemq.RedeliveryPolicy">
                 <property name="maximumRedeliveries" value="0"/>
