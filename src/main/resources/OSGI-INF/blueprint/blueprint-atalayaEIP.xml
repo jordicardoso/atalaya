@@ -78,7 +78,17 @@
                 <responseMessage code="200" message="Ok" />
                 <responseMessage code="404" message="Error, No s'han pogut insertar les dades" />
                 <route id="loadDataT100">
-                    <log message="ok"/>
+                    <split streaming="true" parallelProcessing="true" executorServiceRef="concurrentProfile">
+                        <tokenize token="\n"/>
+                        <convertBodyTo type="String"/>
+                        <unmarshal ref="csvwbcrossgt"/>
+                        <marshal ref="wbcrossgt_json"/>
+                        <to uri="{{wbcrossgtcsvMQ}}"/>
+                    </split>
+                    <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Loaded wbcrossgt dataset into Database"/>
+                    <setBody>
+                        <simple>{"date": ${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}, "message": "Loaded wbcrossgt dataset into Database"</simple>
+                    </setBody>
                 </route>
             </post>
         </rest>
