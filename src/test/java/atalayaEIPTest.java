@@ -1,18 +1,19 @@
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
-import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.model.ModelCamelContext;
-import org.apache.camel.test.blueprint.CamelBlueprintHelper;
 import org.apache.camel.test.blueprint.CamelBlueprintTestSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.osgi.framework.BundleContext;
+import org.apache.camel.Message;
 
 import java.io.InputStream;
 import java.net.URI;
+
+import static org.apache.camel.Exchange.HTTP_RESPONSE_CODE;
+import static org.hamcrest.CoreMatchers.is;
 
 public class atalayaEIPTest extends CamelBlueprintTestSupport {
     public static final String SPROP_CAMEL_CONTEXT_CREATION_TIMEOUT = "6000";
@@ -63,4 +64,19 @@ public class atalayaEIPTest extends CamelBlueprintTestSupport {
         result.assertIsSatisfied();
         context.stop();
     }
+/*
+    @Test
+    public void test_APIwbcrossgt2() throws Exception {
+
+        MockEndpoint result = getMockEndpoint("mock:result");
+        result.expectedMessageCount(1);
+
+        InputStream inStream = getClass().getClassLoader().getResourceAsStream("wbcrossgt2.csv");
+        String payload = context.getTypeConverter().convertTo(String.class, inStream);
+
+        template.sendBody("netty4-http:http://localhost:" + "8282" + "/camel/1.0/transfer", payload);
+
+        String resultat = result.getExchanges().toString();
+        System.out.println(resultat);
+    }*/
 }

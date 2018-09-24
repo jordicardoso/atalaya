@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.1.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="
-            http://www.osgi.org/xmlns/blueprint/v1.0.0 https://osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
-            http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/spring/camel-blueprint.xsd
-            http://aries.apache.org/xmlns/jpa/v1.1.0 http://aries.apache.org/schemas/jpa/jpa_110.xsd">
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+           http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
 
     <bean id="listAggregation" class="aggregationStrategy.ListAggregationStrategy"/>
 
@@ -31,10 +29,12 @@
         </dataFormats>
 
         <restConfiguration apiContextListing="true"
-                           apiContextPath="api-docs" bindingMode="json" component="jetty"
-                           contextPath="camel/1.0" enableCORS="true" host="0.0.0.0" port="8282">
+                           apiContextPath="api-docs" bindingMode="off" component="netty4-http"
+                           contextPath="camel" enableCORS="true" host="localhost" port="8282">
 
+            <endpointProperty key="chunkedMaxContentLength" value="10444800"/>
             <dataFormatProperty key="prettyPrint" value="true" />
+
             <apiProperty key="base.path" value="rest" />
             <apiProperty key="api.version" value="0.0.1" />
             <apiProperty key="api.title" value="t100" />
@@ -43,7 +43,7 @@
             <apiProperty key="cors" value="true" />
         </restConfiguration>
 
-        <rest path="/" consumes="json/xml" produces="application/json">
+        <rest path="/1.0" produces="application/json">
             <description>T100</description>
             <get uri="/runsql">
                 <description>check T100 tables</description>
@@ -69,15 +69,12 @@
                     <log message="ok"/>
                 </route>
             </delete>
-        </rest>
-
-        <rest path="/" consumes="text/csv" produces="application/json">
-
             <post uri="/transfer">
-                <description>load T100 data</description>
+                <description>load WBCROSSGT data</description>
                 <responseMessage code="200" message="Ok" />
                 <responseMessage code="404" message="Error, No s'han pogut insertar les dades" />
-                <route id="loadDataT100">
+                <route id="loadDatawbcrossgt2" streamCache="true">
+                    <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start Loading wbcrossgt dataset into Database"/>
                     <split streaming="true" parallelProcessing="true" executorServiceRef="concurrentProfile">
                         <tokenize token="\n"/>
                         <convertBodyTo type="String"/>
@@ -86,6 +83,7 @@
                         <to uri="{{wbcrossgtcsvMQ}}"/>
                     </split>
                     <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Loaded wbcrossgt dataset into Database"/>
+
                     <setBody>
                         <simple>{"date": ${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}, "message": "Loaded wbcrossgt dataset into Database"</simple>
                     </setBody>
@@ -111,11 +109,12 @@
             <from uri="file:camel/data?fileName=wbcrossgt.csv&amp;noop=false"/>
             <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading wbcrossgt..."/>
             <split streaming="true" parallelProcessing="true" executorServiceRef="concurrentProfile">
-                <tokenize token="\n"/>
+                <tokenize token="\n" group="1000"/>
                 <convertBodyTo type="String"/>
-                <unmarshal ref="csvwbcrossgt"/>
+                <to uri="netty4-http:http://localhost:8282/camel/1.0/transfer"/>
+                <!--<unmarshal ref="csvwbcrossgt"/>
                 <marshal ref="wbcrossgt_json"/>
-                <to uri="{{wbcrossgtcsvMQ}}"/>
+                <to uri="{{wbcrossgtcsvMQ}}"/>-->
             </split>
             <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Loaded wbcrossgt dataset into Database"/>
         </route>
