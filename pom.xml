@@ -8,7 +8,7 @@
 	<groupId>cat.atalaya</groupId>
 	<artifactId>atalayaEIP</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<name>atalayaEIP</name>
 
 	<!-- Properties -->
@@ -82,11 +82,6 @@
 			<artifactId>camel-sql</artifactId>
 			<version>${camel-version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-camel</artifactId>
-            <version>${activemq-version}</version>
-        </dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jdbc</artifactId>
@@ -152,12 +147,6 @@
 			<version>${camel-version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-jetty9</artifactId>
-            <version>${camel-version}</version>
-            <scope>test</scope>
-        </dependency>
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
