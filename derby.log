@@ -1,19 +1,13 @@
 ----------------------------------------------------------------
-Sun Sep 30 20:31:04 CEST 2018:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-0166-2bbf-8577-00000a0f86c0 
-on database directory memory:/home/jcardoso/atalaya/camel/atalaya/atalaya with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
-Loaded from file:/home/jcardoso/.m2/repository/org/apache/derby/derby/10.10.1.1/derby-10.10.1.1.jar
+Mon Oct 08 14:59:07 CEST 2018:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-0166-53c2-74cb-0000093ef010 
+on database directory memory:C:\Users\125331\Documents\git\atalaya\atalaya\atalaya with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
+Loaded from file:/C:/Users/125331/.m2/repository/org/apache/derby/derby/10.10.1.1/derby-10.10.1.1.jar
 java.vendor=Oracle Corporation
-java.runtime.version=1.8.0_181-b13
-user.dir=/home/jcardoso/atalaya/camel/atalaya
-os.name=Linux
+java.runtime.version=1.8.0_111-b14
+user.dir=C:\Users\125331\Documents\git\atalaya\atalaya
+os.name=Windows 7
 os.arch=amd64
-os.version=4.15.0-34-generic
+os.version=6.1
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
-----------------------------------------------------------------
-Sun Sep 30 20:31:14 CEST 2018: Shutting down Derby engine
-----------------------------------------------------------------
-Sun Sep 30 20:31:14 CEST 2018:
-Shutting down instance a816c00e-0166-2bbf-8577-00000a0f86c0 on database directory memory:/home/jcardoso/atalaya/camel/atalaya/atalaya with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
-----------------------------------------------------------------

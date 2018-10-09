@@ -66,7 +66,7 @@
                 <responseMessage code="200" message="Ok" />
                 <responseMessage code="404" message="Error, no hi ha taules" />
                 <route id="getTablesT100">
-                    <toD uri="sql:${body}?dataSourceRef=mysqlthedataDS"/>
+                    <log message="ok"/>
                 </route>
             </get>
             <put uri="/runsql">
@@ -74,7 +74,7 @@
                 <responseMessage code="200" message="Ok" />
                 <responseMessage code="404" message="Error, No s'han pogut crear les taules" />
                 <route id="createTablesT100">
-                    <toD uri="sql:${body}?dataSourceRef=mysqlthedataDS"/>
+                    <log message="ok"/>
                 </route>
             </put>
             <delete uri="/runsql" produces="application/json">
@@ -82,7 +82,7 @@
                 <responseMessage code="200" message="Ok" />
                 <responseMessage code="404" message="Error, No s'han pogut eliminar les taules" />
                 <route id="dropTablesT100">
-                    <toD uri="sql:${body}?dataSourceRef=mysqlthedataDS"/>
+                    <log message="ok"/>
                 </route>
             </delete>
             <post uri="/transfer" produces="application/json">
@@ -106,35 +106,35 @@
                 </route>
             </post>
         </rest>
-<!--
-        <route autoStartup="false" id="loadT100csv" streamCache="true">
-            <from uri="file:camel/data?fileName=T100.csv&amp;noop=false"/>
-            <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading t100..."/>
-            <split streaming="true" parallelProcessing="true">
-                <tokenize token="\n"/>
-                <convertBodyTo type="String"/>
-                <unmarshal ref="csvt100"/>
-                <marshal ref="t100_json"/>
-                <to uri="{{t100csvMQ}}"/>
-            </split>
-            <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Loaded t100 dataset into Database"/>
-        </route>
--->
-<!--
-        <route autoStartup="true" id="loadwbcrossgtcsv" streamCache="true">
-            <from uri="file:camel/data?fileName=wbcrossgt.csv&amp;noop=false"/>
-            <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading wbcrossgt..."/>
-            <split streaming="true" parallelProcessing="true" executorServiceRef="concurrentProfile">
-                <tokenize token="\n" group="1000"/>
-                <convertBodyTo type="String"/>
-                <to uri="netty4-http:http://localhost:8282/camel/1.0/transfer"/>
-                <unmarshal ref="csvwbcrossgt"/>
-                <marshal ref="wbcrossgt_json"/>
-                <to uri="{{wbcrossgtcsvMQ}}"/>
-            </split>
-            <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Loaded wbcrossgt dataset into Database"/>
-        </route>
--->
+        <!--
+                <route autoStartup="false" id="loadT100csv" streamCache="true">
+                    <from uri="file:camel/data?fileName=T100.csv&amp;noop=false"/>
+                    <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading t100..."/>
+                    <split streaming="true" parallelProcessing="true">
+                        <tokenize token="\n"/>
+                        <convertBodyTo type="String"/>
+                        <unmarshal ref="csvt100"/>
+                        <marshal ref="t100_json"/>
+                        <to uri="{{t100csvMQ}}"/>
+                    </split>
+                    <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Loaded t100 dataset into Database"/>
+                </route>
+        -->
+        <!--
+                <route autoStartup="true" id="loadwbcrossgtcsv" streamCache="true">
+                    <from uri="file:camel/data?fileName=wbcrossgt.csv&amp;noop=false"/>
+                    <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start loading wbcrossgt..."/>
+                    <split streaming="true" parallelProcessing="true" executorServiceRef="concurrentProfile">
+                        <tokenize token="\n" group="1000"/>
+                        <convertBodyTo type="String"/>
+                        <to uri="netty4-http:http://localhost:8282/camel/1.0/transfer"/>
+                        <unmarshal ref="csvwbcrossgt"/>
+                        <marshal ref="wbcrossgt_json"/>
+                        <to uri="{{wbcrossgtcsvMQ}}"/>
+                    </split>
+                    <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Loaded wbcrossgt dataset into Database"/>
+                </route>
+        -->
 
         <route autoStartup="true" id="aggregateT100" streamCache="true">
             <from uri="{{t100csvMQ}}"/>
