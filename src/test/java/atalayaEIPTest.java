@@ -58,10 +58,10 @@ public class atalayaEIPTest extends CamelBlueprintTestSupport {
         MockEndpoint result = getMockEndpoint("mock:result");
         result.expectedMessageCount(1);
 
-        InputStream inStream = getClass().getClassLoader().getResourceAsStream("wbcrossgt2.csv");
+        InputStream inStream = getClass().getClassLoader().getResourceAsStream("t100.csv");
         String payload = context.getTypeConverter().convertTo(String.class, inStream);
 
-        template.sendBody("netty4-http:http://localhost:" + "8282" + "/big/1.0/transfer", payload);
+        template.sendBody("netty4-http:http://localhost:" + "8282" + "/big/1.0/transfer/mysqlthedataDS", payload);
 
         String resultat = result.getExchanges().toString();
         System.out.println(resultat);

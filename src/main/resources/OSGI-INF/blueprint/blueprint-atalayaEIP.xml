@@ -85,7 +85,7 @@
                     <toD uri="sql:${body}?dataSourceRef=mysqlthedataDS"/>
                 </route>
             </delete>
-            <post uri="/transfer" produces="application/json">
+            <post uri="/transfer/{datasourceName}" produces="application/json">
                 <description>load data</description>
                 <responseMessage code="200" message="Ok" />
                 <responseMessage code="404" message="Error, No s'han pogut insertar les dades" />
@@ -94,7 +94,7 @@
                     <unmarshal>
                         <csv skipHeaderRecord="true" useOrderedMaps="true" delimiter="|"/>
                     </unmarshal>
-                    <log message="${body}"/>
+                    <log message="${headers}"/>
                     <to uri="{{csvMQ}}"/>
                     <setBody>
                         <simple>{"date": ${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}, "message": "Loaded data into Database"}</simple>
@@ -133,7 +133,7 @@
         </route>
 -->
 
-        <route autoStartup="true" id="aggregateT100" streamCache="true">
+        <route autoStartup="true" id="aggregate" streamCache="true">
             <from uri="{{csvMQ}}"/>
             <!--<transacted ref="PROPAGATION_REQUIRED"/>-->
             <validate>
@@ -141,8 +141,7 @@
             </validate>
 
             <log message="inserting... ${body}"/>
-            <to uri="sql:insert into T100 (SPRSL, MSG, MSGNR, TEXT, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#sprsl', ':#msg', ':#msgnr', ':#text', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=mysqlthedataDS"/>
-
+            <toD uri="sql:${headers.insertSQL}?batch=true&amp;dataSourceRef=${headers.datasourceName}"/>
         </route>
 
     </camelContext>
