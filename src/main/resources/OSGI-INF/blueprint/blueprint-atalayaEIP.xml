@@ -46,7 +46,7 @@
 
         <restConfiguration apiContextListing="true"
                            apiContextPath="api-docs" bindingMode="off" component="netty4-http"
-                           contextPath="camel" enableCORS="true" host="0.0.0.0" port="8282">
+                           contextPath="big" enableCORS="true" host="0.0.0.0" port="8282">
 
             <endpointProperty key="chunkedMaxContentLength" value="10444800"/>
             <dataFormatProperty key="prettyPrint" value="true" />
@@ -91,14 +91,11 @@
                 <responseMessage code="404" message="Error, No s'han pogut insertar les dades" />
                 <route id="loadData" streamCache="true">
                     <log message="${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}: Start Loading data into Database"/>
-                    <split streaming="true" parallelProcessing="true" executorServiceRef="concurrentProfile">
-                        <tokenize token="\n"/>
-                        <convertBodyTo type="String"/>
-                        <unmarshal ref="csvt100"/>
-                        <marshal ref="t100_json"/>
-                        <to uri="{{t100csvMQ}}"/>
-                    </split>
-
+                    <unmarshal>
+                        <csv skipHeaderRecord="true" useOrderedMaps="true" delimiter="|"/>
+                    </unmarshal>
+                    <log message="${body}"/>
+                    <to uri="{{t100csvMQ}}"/>
                     <setBody>
                         <simple>{"date": ${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}, "message": "Loaded data into Database"}</simple>
                     </setBody>
@@ -139,20 +136,13 @@
         <route autoStartup="true" id="aggregateT100" streamCache="true">
             <from uri="{{t100csvMQ}}"/>
             <!--<transacted ref="PROPAGATION_REQUIRED"/>-->
-            <unmarshal ref="json"/>
             <validate>
-                <simple>${body} is 'java.util.Map'</simple>
+                <simple>${body} is 'java.util.ArrayList'</simple>
             </validate>
-            <aggregate id="aggregateT100" parallelProcessing="true" completionTimeout="1000" forceCompletionOnStop="true" strategyRef="listAggregation" completionSize="100">
-                <correlationExpression>
-                    <constant>true</constant>
-                </correlationExpression>
-                <setHeader headerName="aggregate">
-                    <constant></constant>
-                </setHeader>
-                <log message="inserting... ${body}"/>
-                <to uri="sql:insert into T100 (SPRSL, MSG, MSGNR, TEXT, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#sprsl', ':#msg', ':#msgnr', ':#text', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=mysqlthedataDS"/>
-            </aggregate>
+
+            <log message="inserting... ${body}"/>
+            <to uri="sql:insert into T100 (SPRSL, MSG, MSGNR, TEXT, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#sprsl', ':#msg', ':#msgnr', ':#text', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=mysqlthedataDS"/>
+
         </route>
 
         <route autoStartup="true" id="aggregateWbcrossgt" streamCache="true">

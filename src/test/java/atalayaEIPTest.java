@@ -52,21 +52,8 @@ public class atalayaEIPTest extends CamelBlueprintTestSupport {
         return "/OSGI-INF/blueprint/datasource.xml,/OSGI-INF/blueprint/blueprint-atalayaEIP.xml";
     }
 
-    @Test (timeout = 8000)
-    public void AggregationFileTest() throws Exception {
-
-        MockEndpoint result = getMockEndpoint("mock:result");
-        context.start();
-        result.expectedMessageCount(100);
-
-        Thread.sleep(2000);
-
-        result.assertIsSatisfied();
-        context.stop();
-    }
-/*
     @Test
-    public void test_APIwbcrossgt2() throws Exception {
+    public void transferCSV() throws Exception {
 
         MockEndpoint result = getMockEndpoint("mock:result");
         result.expectedMessageCount(1);
@@ -74,9 +61,9 @@ public class atalayaEIPTest extends CamelBlueprintTestSupport {
         InputStream inStream = getClass().getClassLoader().getResourceAsStream("wbcrossgt2.csv");
         String payload = context.getTypeConverter().convertTo(String.class, inStream);
 
-        template.sendBody("netty4-http:http://localhost:" + "8282" + "/camel/1.0/transfer", payload);
+        template.sendBody("netty4-http:http://localhost:" + "8282" + "/big/1.0/transfer", payload);
 
         String resultat = result.getExchanges().toString();
         System.out.println(resultat);
-    }*/
+    }
 }
