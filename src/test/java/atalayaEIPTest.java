@@ -61,14 +61,12 @@ public class atalayaEIPTest extends CamelBlueprintTestSupport {
         InputStream inStream = getClass().getClassLoader().getResourceAsStream("t100.csv");
         String payload = context.getTypeConverter().convertTo(String.class, inStream);
 
-        Exchange exchange = template.request("netty4-http:http://localhost:\" + \"8282\" + \"/big/1.0/transfer/mysqlthedataDS",
+        Exchange exchange = template.request("netty4-http:http://localhost:\" + \"8282\" + \"/big/1.0/transfer/atalayaDs",
                 new Processor() {
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setHeader(Exchange.HTTP_METHOD, "POST");
-                        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "application/json;charset=UTF-8");
-                        exchange.getIn().setHeader("insertSQL", "1");
-                        exchange.getIn().setHeader("StoreID", "3000");
-                        exchange.getIn().setHeader("temporalId", "180619856");
+                        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "text/plain;charset=UTF-8");
+                        exchange.getIn().setHeader("insertSQL", "insert into T100 (SPRSL, MSG, MSGNR, TEXT, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#SPRSL', ':#MSG', ':#MSGNR', ':#TEXT', ':#BIG_TRANSFERDATE', ':#BIG_TRANSFERTIME', ':#BIG_TRANSFERTSTAMP')");
                         exchange.getIn().setBody(payload);
                     }
                 });

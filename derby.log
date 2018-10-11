@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Thu Oct 11 20:51:35 CEST 2018:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-0166-6478-42e3-00000a2c7fa8 
+Thu Oct 11 21:27:37 CEST 2018:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-0166-6499-3be3-00000d78f460 
 on database directory memory:/home/jcardoso/atalaya/camel/atalaya/atalaya with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
 Loaded from file:/home/jcardoso/.m2/repository/org/apache/derby/derby/10.10.1.1/derby-10.10.1.1.jar
 java.vendor=Oracle Corporation
@@ -11,9 +11,3 @@ os.arch=amd64
 os.version=4.15.0-36-generic
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
-----------------------------------------------------------------
-Thu Oct 11 20:51:37 CEST 2018: Shutting down Derby engine
-----------------------------------------------------------------
-Thu Oct 11 20:51:37 CEST 2018:
-Shutting down instance a816c00e-0166-6478-42e3-00000a2c7fa8 on database directory memory:/home/jcardoso/atalaya/camel/atalaya/atalaya with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
-----------------------------------------------------------------
