@@ -95,7 +95,7 @@
                         <csv skipHeaderRecord="true" useOrderedMaps="true" delimiter="|"/>
                     </unmarshal>
                     <log message="${body}"/>
-                    <to uri="{{t100csvMQ}}"/>
+                    <to uri="{{csvMQ}}"/>
                     <setBody>
                         <simple>{"date": ${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}, "message": "Loaded data into Database"}</simple>
                     </setBody>
@@ -134,7 +134,7 @@
 -->
 
         <route autoStartup="true" id="aggregateT100" streamCache="true">
-            <from uri="{{t100csvMQ}}"/>
+            <from uri="{{csvMQ}}"/>
             <!--<transacted ref="PROPAGATION_REQUIRED"/>-->
             <validate>
                 <simple>${body} is 'java.util.ArrayList'</simple>
@@ -143,24 +143,6 @@
             <log message="inserting... ${body}"/>
             <to uri="sql:insert into T100 (SPRSL, MSG, MSGNR, TEXT, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#sprsl', ':#msg', ':#msgnr', ':#text', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=mysqlthedataDS"/>
 
-        </route>
-
-        <route autoStartup="true" id="aggregateWbcrossgt" streamCache="true">
-            <from uri="{{wbcrossgtcsvMQ}}"/>
-            <!--<transacted ref="PROPAGATION_REQUIRED"/>-->
-            <unmarshal ref="json"/>
-            <validate>
-                <simple>${body} is 'java.util.Map'</simple>
-            </validate>
-            <aggregate id="aggregateWbcrossgt"  parallelProcessing="true" completionTimeout="5000" forceCompletionOnStop="true" strategyRef="listAggregation" completionSize="50">
-                <correlationExpression>
-                    <constant>true</constant>
-                </correlationExpression>
-                <setHeader headerName="aggregate">
-                    <constant></constant>
-                </setHeader>
-                <!--<to uri="sql:insert into WBCROSSGT (OTYPE, NAME, INCLUDE, DIRECT, INDIRECT, COMPONENT, ISHASH, UDATE, UZEIT, UNAME, BIG_TRANSFERDATE, BIG_TRANSFERTIME, BIG_TRANSFERTSTAMP) values (':#otype', ':#name', ':#include', ':#direct', ':#indirect', ':#component', ':#ishash',  ':#udate', ':#uzeit', ':#uname', ':#big_TRANSFERDATE', ':#big_TRANSFERTIME', ':#big_TRANSFERTSTAMP')?batch=true&amp;dataSourceRef=atalayaDs"/>-->
-            </aggregate>
         </route>
 
     </camelContext>
