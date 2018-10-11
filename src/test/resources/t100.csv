@@ -1,4 +1,4 @@
-MSG|MSGNR|TEXT|BIG_TRANSFERDATE|BIG_TRANSFERTIME|BIG_TRANSFERTSTAMP
+SPRSL|MSG|MSGNR|TEXT|BIG_TRANSFERDATE|BIG_TRANSFERTIME|BIG_TRANSFERTSTAMP
 S|00|001|&1&2&3&4&5&6&7&8|2018-07-23|23:01:00|20180723210118
 S|00|002|Indique un valor válido|2018-07-23|23:01:00|20180723210118 
 S|00|003|Mensaje con longitud máxima y máxima cantidad variables: & & & & 1234*|2018-07-23|23:01:00|20180723210118 
@@ -810,7 +810,6 @@ S|00|835|Batch input: No existe ningún log para archivar|2018-07-23|23:01:00|20
 S|00|836|Batch input: No se ha podido abrir el fichero de archivo|2018-07-23|23:01:00|20180723210118 
 S|00|838|Imposible borrar: Para carpeta & aún existe un job de fondo|2018-07-23|23:01:00|20180723210118 
 S|00|839|Liberac.no posible: Ya existe una orden actualiz.para el juego de datos &|2018-07-23|23:01:00|20180723210118 
-S|00|840|"Omitir imagen inicial" no permitido para: &|2018-07-23|23:01:00|20180723210118 
 S|00|850|Tamaño total de la memoria extendida|2018-07-23|23:01:00|20180723210118 
 S|00|851|Asignación máxima de la memoria extendida desde el inicio|2018-07-23|23:01:00|20180723210118 
 S|00|852|Asignación máxima de la memoria extendida desde la última consulta|2018-07-23|23:01:00|20180723210118 

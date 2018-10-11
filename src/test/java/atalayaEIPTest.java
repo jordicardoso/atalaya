@@ -61,7 +61,7 @@ public class atalayaEIPTest extends CamelBlueprintTestSupport {
         InputStream inStream = getClass().getClassLoader().getResourceAsStream("t100.csv");
         String payload = context.getTypeConverter().convertTo(String.class, inStream);
 
-        Exchange exchange = template.request("netty4-http:http://localhost:\" + \"8282\" + \"/big/1.0/transfer/atalayaDs",
+        Exchange exchange = template.request("netty4-http:http://localhost:8282/big/1.0/transfer/atalayaDs",
                 new Processor() {
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setHeader(Exchange.HTTP_METHOD, "POST");
