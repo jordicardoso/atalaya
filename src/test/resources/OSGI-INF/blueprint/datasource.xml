@@ -21,7 +21,7 @@
 		<property name="password" value="${derby_password}"/>
 	</bean>-->
 
-    <bean id="atalayaDs" class="org.apache.commons.dbcp2.BasicDataSource">
+    <!--<bean id="atalayaDs" class="org.apache.commons.dbcp2.BasicDataSource">
         <property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
         <property name="url" value="jdbc:derby:memory:atalaya;create=true"/>
         <property name="username" value=""/>
@@ -35,11 +35,10 @@
 
     <bean id="databaseBean" class="DatabaseBean"/>
 
-    <!--
-    <service ref="atalaya" interface="javax.sql.DataSource" ranking="5">
+    <service ref="atalayaDs" interface="javax.sql.DataSource" ranking="5">
         <service-properties>
             <entry key="datasource.name" value="atalayaDs"/>
         </service-properties>
-    </service>
-    -->
+    </service>-->
+
 </blueprint>
