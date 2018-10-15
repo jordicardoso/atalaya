@@ -6,8 +6,8 @@
 
     <bean id="mysqlthedata" class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
         <!--<property name="serverName" value="mysql-test.cniyuo94cdas.eu-west-1.rds.amazonaws.com"/>-->
-        <property name="url" value="jdbc:mysql://192.168.99.100:3306/thedata"/>
-        <property name="user" value="root"/>
+        <property name="url" value="jdbc:mysql://mysql-test.cniyuo94cdas.eu-west-1.rds.amazonaws.com:3306/thedata"/>
+        <property name="user" value="admocp"/>
         <property name="password" value="##admocp" />
     </bean>
 
