@@ -36,7 +36,7 @@
 
         <restConfiguration apiContextListing="true"
                            apiContextPath="api-docs" bindingMode="off" component="netty4-http"
-                           contextPath="big" enableCORS="true" host="0.0.0.0" port="8383">
+                           contextPath="big" enableCORS="true" host="0.0.0.0" port="8282">
 
             <endpointProperty key="chunkedMaxContentLength" value="10444800"/>
             <dataFormatProperty key="prettyPrint" value="true" />
