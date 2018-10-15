@@ -8,7 +8,7 @@
 	<groupId>cat.atalaya</groupId>
 	<artifactId>atalayaEIP</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.0.16-SNAPSHOT</version>
+	<version>0.0.26-SNAPSHOT</version>
 	<name>atalayaEIP</name>
 
 	<!-- Properties -->
@@ -182,6 +182,7 @@
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
 			<version>10.10.1.1</version>
+            <scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
