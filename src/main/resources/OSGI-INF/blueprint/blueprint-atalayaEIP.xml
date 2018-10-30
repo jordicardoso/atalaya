@@ -86,23 +86,19 @@
                     </unmarshal>
                     <!--<toD uri="dataformat:csv:marshal?delimiter=${header.FIELD_DELIMITER}"/>-->
                     <to uri="{{csvMQ}}"/>
-                    <setBody>
-                        <simple>{"date": ${date:now:yyyy-MM-dd'T'HH:mm:ss:SSS}, "message": "Loaded data into Database"}</simple>
-                    </setBody>
                 </route>
             </post>
         </rest>
 
         <route autoStartup="true" id="bulkInsert" streamCache="true">
             <from uri="{{csvMQ}}"/>
-            <!--<transacted ref="PROPAGATION_REQUIRED"/>-->
+            <transacted ref="PROPAGATION_REQUIRED"/>
             <validate>
                 <simple>${body} is 'java.util.ArrayList'</simple>
             </validate>
             <threads poolSize="10">
                 <split streaming="true" parallelProcessing="true" strategyRef="listAggregation">
                     <simple>${body}</simple>
-
                     <aggregate strategyRef="listAggregation" completionSize="100" completionTimeout="1000" parallelProcessing="true">
                         <correlationExpression>
                             <constant>true</constant>
@@ -111,12 +107,11 @@
                     </aggregate>
                 </split>
             </threads>
-            <log message="loaded data to ${headers.datasourceName}"/>
         </route>
 
     </camelContext>
 
-    <!-- TX configuration
+    <!-- TX configuration-->
     <bean id="transactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
         <property name="connectionFactory" ref="pooledJmsConnectionFactory"/>
     </bean>
@@ -125,8 +120,8 @@
         <property name="transactionManager" ref="transactionManager"/>
         <property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"/>
     </bean>
--->
-    <!-- JMS configuration
+
+    <!-- JMS configuration -->
     <bean id="pooledJmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" init-method="start" destroy-method="stop">
         <property name="maxConnections" value="8" />
         <property name="connectionFactory" ref="jmsConnectionFactory" />
@@ -142,18 +137,18 @@
             </bean>
         </property>
     </bean>
--->
-    <!-- JMS configuration with transactions
+
+    <!-- JMS configuration with transactions -->
     <bean id="activemqTx" class="org.apache.activemq.camel.component.ActiveMQComponent">
         <property name="connectionFactory" ref="pooledJmsConnectionFactory"/>
         <property name="transacted" value="true"/>
         <property name="transactionManager" ref="transactionManager"/>
-    </bean>-->
+    </bean>
 
-    <!-- JMS configuration for test enqueue/dequeue without transactions
+    <!-- JMS configuration for test enqueue/dequeue without transactions -->
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
         <property name="connectionFactory" ref="pooledJmsConnectionFactory"/>
         <property name="transacted" value="false"/>
-    </bean>-->
+    </bean>
 
 </blueprint>

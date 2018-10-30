@@ -872,7 +872,8 @@ S|00|961|Error BD: Referencia a cursor no válido.|2018-07-23|23:01:00|201807232
 S|00|962|Error BD: Acceso a la interfase de BD sin éxito.|2018-07-23|23:01:00|20180723210118 
 S|00|963|Error BD: Prohibido el acceso a la interfase de BD.|2018-07-23|23:01:00|20180723210118 
 S|00|964|Error BD: Acceso a registro individual en tabla & sin clave primaria.|2018-07-23|23:01:00|20180723210118 
-S|00|965|Error BD: Inconsistencia entre interfase BD y catálogo de datos.|2018-07-23|23:01:00|20180723210118 
+S|00|965|Error BD: Inconsistencia entre interfase BD y catálogo de datos.|2018-07-23|23:01:00|20180723210118
+S|00|965|Error BD: Inconsistencia entre interfase BD y catálogo de datos.|2018-07-23|
 S|00|966|DB error: Enough memory for table $ in the table buffer|2018-07-23|23:01:00|20180723210118 
 S|00|967|Error BD: Falta espacio de memoria para tabla & en mem. interm. tablas.|2018-07-23|23:01:00|20180723210118 
 S|00|968|Error BD: Regsitros datos con resultado clasificados según clave primaria|2018-07-23|23:01:00|20180723210118 
