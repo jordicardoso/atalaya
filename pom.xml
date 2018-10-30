@@ -8,7 +8,7 @@
 	<groupId>cat.atalaya</groupId>
 	<artifactId>atalayaEIP</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.0.30-SNAPSHOT</version>
+	<version>0.0.32-SNAPSHOT</version>
 	<name>atalayaEIP</name>
 
 	<!-- Properties -->
@@ -260,7 +260,7 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>atalayaEIP</Bundle-SymbolicName>
-						<Bundle-Name>atalayaEIP</Bundle-Name>
+						<Import-Package>*,org.apache.activemq.camel.component</Import-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
 				</configuration>

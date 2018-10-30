@@ -112,9 +112,7 @@
     </camelContext>
 
     <!-- TX configuration-->
-    <bean id="transactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
-        <property name="connectionFactory" ref="pooledJmsConnectionFactory"/>
-    </bean>
+    <bean id="transactionManager" class="org.springframework.transaction.PlatformTransactionManager"/>
 
     <bean id="PROPAGATION_REQUIRED" class="org.apache.camel.spring.spi.SpringTransactionPolicy">
         <property name="transactionManager" ref="transactionManager"/>
